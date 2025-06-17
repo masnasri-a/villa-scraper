@@ -22,15 +22,15 @@ def get_data(start_date: str, total_nights: int):
     total_adults = 5
     total_children = 0
     date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
-
-    villa_names = [
-        "Villa Como",
-        "Villa Kobe",
-        "Villa Soho",
-        "Villa Verde",
-        "Villa Cruz",
-        "Villa Sante"
-    ]
+    hotel_ids = {
+        "635134": "Villa Cruz",
+        "632905": "Villa Soho",
+        "632903": "Villa Verde",
+        "632904": "Villa Kobe",
+        "637236": "Villa Sante",
+        "623530": "Villa Como"
+    }
+    
     new_data = []
     start_checkin = date_obj
     print(start_checkin)
@@ -41,7 +41,6 @@ def get_data(start_date: str, total_nights: int):
         headers=headers,
     )
     if response.status_code == 200:
-        print("Request was successful.")
         match = re.search(r'^[a-zA-Z0-9_]+\((.*)\)$', response.text, re.DOTALL)
         if match:
             json_str = match.group(1)
@@ -50,10 +49,11 @@ def get_data(start_date: str, total_nights: int):
                 data = json.loads(json_str)
                 for idx, hotel in enumerate(data):
                     ## available_rooms = []
+                    id_hotel = str(hotel["HotelId"])
                     avail = hotel['RoomRates']["RoomRates"][0]['Availability']['Day']
                     for day, avail_res in enumerate(avail):
                         temp = {
-                            'name': villa_names[idx],
+                            'name': hotel_ids.get(id_hotel, "Unknown Villa"),
                         }
                         new_date = date_obj + timedelta(days=day)
                         temps = {}
